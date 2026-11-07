@@ -10,38 +10,51 @@
 
 ## 环境要求
 
-- JDK 17 或更高版本
-- Maven 3.9+（仅从源码构建时需要；直接用打包好的 jar 则不需要）
+| 使用方式 | 需要安装 |
+|---|---|
+| 直接运行 Release 中的 jar | JDK 17 或 JRE 17 |
+| 从源码构建 | JDK 17 + Maven 3.9+ |
+| Docker | Docker Desktop |
 
 ## 快速开始
 
-### 方式一：直接运行已构建的 jar
+### 方式一：下载 Release 中的 jar（最简单）
+
+从 [Releases](https://github.com/jglChina/fight-game-web-1.0/releases) 页面下载 `fight-game-web-1.0.0.jar`，放到任意目录，然后执行：
 
 ```bash
-java -jar target/fight-game-web-1.0.0.jar
+java -jar fight-game-web-1.0.0.jar
 ```
 
 启动后浏览器访问 <http://localhost:8080>，看到登录页即为成功。
 控制台出现 `Tomcat started on port 8080` 表示服务已就绪。
 
+如果你已经自己构建过，也可以直接运行本地产物：
+
+```bash
+java -jar target/fight-game-web-1.0.0.jar
+```
+
 ### 方式二：从源码构建
 
 ```bash
+git clone https://github.com/jglChina/fight-game-web-1.0.git
+cd fight-game-web-1.0
 mvn -B clean package -DskipTests
 java -jar target/fight-game-web-1.0.0.jar
 ```
 
-### 方式三：用 Maven 直接启动（开发调试）
-
-```bash
-mvn spring-boot:run
-```
-
-### 方式四：Docker
+### 方式三：Docker
 
 ```bash
 docker build -t fight-game-web .
 docker run --rm -p 8080:8080 fight-game-web
+```
+
+### 方式四：开发调试
+
+```bash
+mvn spring-boot:run
 ```
 
 ## 停止服务
