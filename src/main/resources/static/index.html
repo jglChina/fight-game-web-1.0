@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字格斗游戏 - 登录</title>
+    <!-- 双保险：禁止浏览器缓存 HTML 本身（服务端另有 no-store 响应头） -->
+    <meta http-equiv="Cache-Control" content="no-store">
+    <!-- 全局样式；?v= 为版本号，改前端时 +1 -->
+    <link rel="stylesheet" href="css/style.css?v=20">
+</head>
+<body class="auth-page page-login">
+
+<!-- ========== 顶部标题区 ========== -->
+<header class="page-header">
+    <h1>文字格斗游戏</h1>
+    <p class="subtitle">登录后开始你的征程</p>
+</header>
+
+<main class="auth-container">
+
+    <!-- ========== 表单容器：登录 / 注册 / 忘记密码 三套表单在此切换 ========== -->
+    <div class="form-wrapper">
+
+        <!-- ---------- 登录表单 ---------- -->
+        <section id="login-panel" class="form-panel">
+            <h2>登录</h2>
+            <form id="login-form" autocomplete="off">
+                <div class="field">
+                    <label for="login-username">用户名</label>
+                    <input type="text" id="login-username" placeholder="3~16 位字母或数字" maxlength="16">
+                </div>
+                <div class="field">
+                    <label for="login-password">密码</label>
+                    <!-- 密码框 + 显示/隐藏按钮 -->
+                    <div class="pwd-wrap">
+                        <input type="password" id="login-password" placeholder="请输入密码" maxlength="8">
+                        <button type="button" class="pwd-toggle" data-pwd-toggle title="显示密码">👁</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="login-captcha">验证码</label>
+                    <div class="captcha-row">
+                        <input type="text" id="login-captcha" placeholder="输入右侧验证码" maxlength="5">
+                        <!-- 验证码展示框：点击刷新 -->
+                        <button type="button" class="captcha-box" data-captcha-refresh title="点击刷新验证码">----</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">登录</button>
+            </form>
+            <div class="panel-links">
+                <a href="#" data-goto="forgot">忘记密码？</a>
+                <a href="#" data-goto="register">没有账号？去注册</a>
+            </div>
+        </section>
+
+        <!-- ---------- 注册表单 ---------- -->
+        <section id="register-panel" class="form-panel hidden">
+            <h2>注册</h2>
+            <form id="register-form" autocomplete="off">
+                <div class="field">
+                    <label for="register-username">用户名</label>
+                    <input type="text" id="register-username" placeholder="3~16 位字母或数字，不能纯数字" maxlength="16">
+                </div>
+                <div class="field">
+                    <label for="register-password">密码</label>
+                    <div class="pwd-wrap">
+                        <input type="password" id="register-password" placeholder="3~8 位，需同时含字母和数字" maxlength="8">
+                        <button type="button" class="pwd-toggle" data-pwd-toggle title="显示密码">👁</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="register-password2">确认密码</label>
+                    <div class="pwd-wrap">
+                        <input type="password" id="register-password2" placeholder="再次输入密码" maxlength="8">
+                        <button type="button" class="pwd-toggle" data-pwd-toggle title="显示密码">👁</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="register-phone">手机号</label>
+                    <!-- inputmode=numeric：手机端弹数字键盘；data-phone 供 JS 过滤非数字 -->
+                    <input type="text" id="register-phone" inputmode="numeric" data-phone
+                           placeholder="11 位手机号，以 1 开头" maxlength="11">
+                </div>
+                <div class="field">
+                    <label for="register-captcha">验证码</label>
+                    <div class="captcha-row">
+                        <input type="text" id="register-captcha" placeholder="输入右侧验证码" maxlength="5">
+                        <button type="button" class="captcha-box" data-captcha-refresh title="点击刷新验证码">----</button>
+                    </div>
+                </div>
+                <!-- 头像：可选，选图后前端压缩并预览，注册成功存 localStorage -->
+                <div class="field">
+                    <label>头像（可选）</label>
+                    <div class="avatar-uploader">
+                        <label class="avatar-pick" for="register-avatar" title="点击选择头像">
+                            <img id="avatar-preview" class="avatar-preview hidden" alt="头像预览">
+                            <span class="avatar-placeholder" id="avatar-placeholder">＋</span>
+                        </label>
+                        <div class="avatar-side">
+                            <span class="avatar-tip">JPG / PNG，建议正方形</span>
+                            <button type="button" id="btn-avatar-remove" class="avatar-remove hidden">移除头像</button>
+                        </div>
+                        <input type="file" id="register-avatar" class="avatar-input" accept="image/*">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">注册</button>
+            </form>
+            <div class="panel-links">
+                <a href="#" data-goto="login">已有账号？去登录</a>
+            </div>
+        </section>
+
+        <!-- ---------- 忘记密码表单（接口不需要验证码） ---------- -->
+        <section id="forgot-panel" class="form-panel hidden">
+            <h2>忘记密码</h2>
+            <form id="forgot-form" autocomplete="off">
+                <div class="field">
+                    <label for="forgot-username">用户名</label>
+                    <input type="text" id="forgot-username" placeholder="请输入注册时的用户名" maxlength="16">
+                </div>
+                <div class="field">
+                    <label for="forgot-phone">手机号</label>
+                    <input type="text" id="forgot-phone" inputmode="numeric" data-phone
+                           placeholder="请输入注册时绑定的手机号" maxlength="11">
+                </div>
+                <div class="field">
+                    <label for="forgot-password">新密码</label>
+                    <div class="pwd-wrap">
+                        <input type="password" id="forgot-password" placeholder="3~8 位，需同时含字母和数字" maxlength="8">
+                        <button type="button" class="pwd-toggle" data-pwd-toggle title="显示密码">👁</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="forgot-password2">确认新密码</label>
+                    <div class="pwd-wrap">
+                        <input type="password" id="forgot-password2" placeholder="再次输入新密码" maxlength="8">
+                        <button type="button" class="pwd-toggle" data-pwd-toggle title="显示密码">👁</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">重置密码</button>
+            </form>
+            <div class="panel-links">
+                <a href="#" data-goto="login">返回登录</a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ========== 提示区：错误 / 成功消息 ========== -->
+    <div id="auth-message" class="message-area"></div>
+
+</main>
+
+<!-- 公共层必须先加载 -->
+<script src="js/common.js?v=20"></script>
+<!-- 登录页逻辑 -->
+<script src="js/index.js?v=20"></script>
+</body>
+</html>

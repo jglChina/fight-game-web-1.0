@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字格斗游戏 - 战斗</title>
+    <!-- 双保险：禁止浏览器缓存 HTML 本身（服务端另有 no-store 响应头） -->
+    <meta http-equiv="Cache-Control" content="no-store">
+    <!-- ?v= 为版本号，改前端时 +1 -->
+    <link rel="stylesheet" href="css/style.css?v=20">
+</head>
+<body class="page-battle">
+
+<!-- ========== 顶部：回合数 + 放弃战斗 ========== -->
+<header class="page-header battle-page-header">
+    <h1 class="battle-title">⚔ 战斗中</h1>
+    <div class="battle-header-right">
+        <span id="round-text" class="round-text">第 1 回合</span>
+        <button type="button" id="btn-abandon" class="btn-abandon">放弃战斗</button>
+    </div>
+</header>
+
+<main class="battle-container">
+
+    <!-- ========== 双方对峙区（宽屏左右，窄屏上下） ========== -->
+    <div class="fighters-row">
+
+    <!-- ========== 我方区域 ========== -->
+    <section id="player-area" class="fighter-area player-area">
+        <div class="fighter-head">
+            <span class="fighter-emoji" id="player-emoji">🛡️</span>
+            <img id="player-avatar-icon" class="fighter-avatar-icon hidden" alt="头像">
+            <div class="fighter-info">
+                <div class="fighter-name-row">
+                    <span class="fighter-name" id="player-name">我</span>
+                </div>
+                <div class="fighter-attr-row">
+                    <span class="mini-attr">⚔️ ATK <b id="player-atk">-</b></span>
+                    <span class="mini-attr">🛡️ DEF <b id="player-def">-</b></span>
+                </div>
+            </div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label">
+                <span>❤️ HP</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill hp" id="player-hp-bar" style="width: 100%"></div>
+                <div class="bar-text"><span id="player-hp-cur">0</span>&nbsp;/&nbsp;<span id="player-hp-max">100</span></div>
+            </div>
+        </div>
+        <div class="bar-row">
+            <div class="bar-label">
+                <span>💧 MP</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill mp" id="player-mp-bar" style="width: 100%"></div>
+                <div class="bar-text"><span id="player-mp-cur">0</span>&nbsp;/&nbsp;<span id="player-mp-max">100</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== 敌方区域 ========== -->
+    <section id="enemy-area" class="fighter-area enemy-area">
+        <div class="fighter-head enemy-head">
+            <div class="fighter-info enemy-info">
+                <div class="fighter-name-row">
+                    <span class="fighter-name enemy-name" id="enemy-name">-</span>
+                    <span id="enemy-defending-tag" class="defending-tag hidden">🛡️ 防御姿态</span>
+                </div>
+                <div class="fighter-attr-row">
+                    <span class="mini-attr">⚔️ ATK <b id="enemy-atk">-</b></span>
+                    <span class="mini-attr">🛡️ DEF <b id="enemy-def">-</b></span>
+                </div>
+            </div>
+            <span class="fighter-emoji" id="enemy-emoji">👹</span>
+            <img id="enemy-avatar-icon" class="fighter-avatar-icon hidden" alt="敌人">
+        </div>
+        <div class="bar-row">
+            <div class="bar-label">
+                <span>❤️ HP</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill hp" id="enemy-hp-bar" style="width: 100%"></div>
+                <div class="bar-text"><span id="enemy-hp-cur">0</span>&nbsp;/&nbsp;<span id="enemy-hp-max">100</span></div>
+            </div>
+        </div>
+    </section>
+
+    </div><!-- /fighters-row -->
+
+    <!-- ========== 行动区：普通攻击 / 强力一击 / 生命汲取 / 使用道具 ========== -->
+    <div id="action-bar" class="action-bar">
+        <button type="button" id="btn-attack" class="btn-action attack">
+            <span class="btn-icon">⚔️</span>
+            <span class="btn-text">普通攻击</span>
+        </button>
+        <button type="button" id="btn-skill-heavy" class="btn-action skill">
+            <span class="btn-icon">⚡</span>
+            <span class="btn-text">强力一击</span>
+            <span class="btn-cost">10 MP</span>
+        </button>
+        <button type="button" id="btn-skill-drain" class="btn-action heal">
+            <span class="btn-icon">💧</span>
+            <span class="btn-text">生命汲取</span>
+            <span class="btn-cost">10 MP</span>
+        </button>
+        <button type="button" id="btn-item" class="btn-action item">
+            <span class="btn-icon">🎒</span>
+            <span class="btn-text">使用道具</span>
+        </button>
+    </div>
+
+    <!-- ========== 战斗日志区：分色滚动渲染 ========== -->
+    <div class="sub-title battle-log-title">📜 战斗日志</div>
+    <div id="battle-log" class="battle-log"></div>
+
+</main>
+
+<!-- ========== 结算弹层：胜利 rewards / 失败 taunt ========== -->
+<div id="result-overlay" class="overlay hidden">
+    <div class="overlay-card" id="result-card">
+        <!-- 内容由 JS 动态填充 -->
+    </div>
+</div>
+
+<!-- ========== 道具选择弹窗 ========== -->
+<div id="item-picker-overlay" class="overlay hidden">
+    <div class="overlay-card item-picker-card">
+        <div class="overlay-title">🎒 选择道具</div>
+        <div id="item-picker-list" class="item-picker-list"></div>
+        <div class="overlay-actions">
+            <button type="button" id="btn-item-cancel" class="btn-overlay-secondary">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== 提示区 ========== -->
+<div id="battle-message" class="message-area"></div>
+
+<script src="js/common.js?v=20"></script>
+<script src="js/battle.js?v=20"></script>
+</body>
+</html>

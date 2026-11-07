@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字格斗游戏 - 主页</title>
+    <meta http-equiv="Cache-Control" content="no-store">
+    <link rel="stylesheet" href="css/style.css?v=20">
+</head>
+<body class="page-game">
+
+<!-- ========== 顶部栏：欢迎语 + 退出登录 ========== -->
+<header class="page-header game-page-header">
+    <h1>文字格斗游戏</h1>
+    <div class="user-bar">
+        <!-- 点圆形头像即可更换；未设置头像时显示 👤 占位 -->
+        <button type="button" id="btn-avatar" class="user-avatar-btn" title="点击更换头像">
+            <img id="user-avatar" class="user-avatar hidden" alt="头像">
+            <span id="user-avatar-placeholder" class="user-avatar-placeholder">👤</span>
+        </button>
+        <input type="file" id="avatar-input" class="avatar-input" accept="image/*">
+        <span id="welcome-text">欢迎</span>
+        <button type="button" id="btn-logout" class="btn-logout">退出登录</button>
+    </div>
+</header>
+
+<main class="game-container">
+
+    <!-- ========== 区域 A：角色创建（仅未创建角色时显示） ========== -->
+    <section id="create-panel" class="panel hidden">
+        <h2 class="panel-title">⚔ 创建你的角色</h2>
+        <p class="panel-desc">共有 <strong class="points-total">30</strong> 点属性可分配，请合理分配四项属性点</p>
+
+        <div class="points-allocator" id="points-allocator">
+            <div class="points-row" data-attr="hp">
+                <div class="points-label">
+                    <span class="attr-icon">❤️</span>
+                    <span class="attr-name">生命值</span>
+                </div>
+                <div class="points-ctrl">
+                    <button type="button" data-points-minus aria-label="减少">−</button>
+                    <span class="points-val">0</span>
+                    <button type="button" data-points-plus aria-label="增加">+</button>
+                </div>
+                <div class="preview-val">当前 HP <span class="preview-num">100</span></div>
+            </div>
+
+            <div class="points-row" data-attr="atk">
+                <div class="points-label">
+                    <span class="attr-icon">⚔️</span>
+                    <span class="attr-name">攻击力</span>
+                </div>
+                <div class="points-ctrl">
+                    <button type="button" data-points-minus aria-label="减少">−</button>
+                    <span class="points-val">0</span>
+                    <button type="button" data-points-plus aria-label="增加">+</button>
+                </div>
+                <div class="preview-val">当前 ATK <span class="preview-num">10</span></div>
+            </div>
+
+            <div class="points-row" data-attr="def">
+                <div class="points-label">
+                    <span class="attr-icon">🛡️</span>
+                    <span class="attr-name">防御力</span>
+                </div>
+                <div class="points-ctrl">
+                    <button type="button" data-points-minus aria-label="减少">−</button>
+                    <span class="points-val">0</span>
+                    <button type="button" data-points-plus aria-label="增加">+</button>
+                </div>
+                <div class="preview-val">当前 DEF <span class="preview-num">0</span></div>
+            </div>
+
+            <div class="points-row" data-attr="mp">
+                <div class="points-label">
+                    <span class="attr-icon">💧</span>
+                    <span class="attr-name">蓝  量</span>
+                </div>
+                <div class="points-ctrl">
+                    <button type="button" data-points-minus aria-label="减少">−</button>
+                    <span class="points-val">0</span>
+                    <button type="button" data-points-plus aria-label="增加">+</button>
+                </div>
+                <div class="preview-val">当前 MP <span class="preview-num">100</span></div>
+            </div>
+        </div>
+
+        <div class="create-footer">
+            <span class="remaining-info">
+                剩余点数：<strong id="remaining-points" class="remaining-num">30</strong>
+            </span>
+            <button type="button" id="btn-create-role" class="btn btn-primary btn-create" disabled>
+                创建角色
+            </button>
+        </div>
+    </section>
+
+    <!-- ========== 区域 B：角色信息（已有角色时显示） ========== -->
+    <section id="role-panel" class="panel hidden">
+        <div class="role-header">
+            <span class="role-name" id="role-name">-</span>
+            <span class="role-wins">🏆 胜场：<strong id="role-wins">0</strong></span>
+        </div>
+
+        <div class="bar-row">
+            <div class="bar-label">
+                <span>❤️ HP</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill hp" id="hp-bar" style="width: 100%"></div>
+                <div class="bar-text"><span id="hp-cur">0</span>&nbsp;/&nbsp;<span id="hp-max">100</span></div>
+            </div>
+        </div>
+
+        <div class="bar-row">
+            <div class="bar-label">
+                <span>💧 MP</span>
+            </div>
+            <div class="bar-track">
+                <div class="bar-fill mp" id="mp-bar" style="width: 100%"></div>
+                <div class="bar-text"><span id="mp-cur">0</span>&nbsp;/&nbsp;<span id="mp-max">100</span></div>
+            </div>
+        </div>
+
+        <div class="attr-grid">
+            <div class="attr-item">
+                <span class="attr-key">❤️ 生命</span>
+                <span class="attr-val" id="attr-maxhp">-</span>
+            </div>
+            <div class="attr-item">
+                <span class="attr-key">⚔️ 攻击</span>
+                <span class="attr-val" id="attr-atk">-</span>
+            </div>
+            <div class="attr-item">
+                <span class="attr-key">🛡️ 防御</span>
+                <span class="attr-val" id="attr-def">-</span>
+            </div>
+            <div class="attr-item">
+                <span class="attr-key">💧 蓝量</span>
+                <span class="attr-val" id="attr-maxmp">-</span>
+            </div>
+        </div>
+
+        <div class="sub-title">✨ 技能列表</div>
+        <div class="skill-list" id="skill-list"></div>
+
+        <div class="sub-title">🎒 背 包</div>
+        <div class="package-list" id="package-list">
+            <div class="package-empty">背包空空如也～</div>
+        </div>
+
+        <div class="battle-entry">
+            <button type="button" id="btn-battle" class="btn-battle">⚔ 开始战斗</button>
+        </div>
+    </section>
+
+</main>
+
+<div id="game-message" class="message-area"></div>
+
+<!-- 道具使用数量选择弹层（数量>1 时弹出） -->
+<div id="item-use-overlay" class="overlay hidden">
+    <div class="overlay-card item-use-card">
+        <div class="overlay-title">使用道具</div>
+        <div id="item-use-info" class="item-use-info">
+            <!-- 由 JS 填充：道具名 / 当前数量 / 效果 -->
+        </div>
+        <div class="qty-picker">
+            <button type="button" id="qty-minus" class="qty-btn">−</button>
+            <span id="qty-value" class="qty-value">1</span>
+            <button type="button" id="qty-plus" class="qty-btn">+</button>
+        </div>
+        <div class="overlay-actions">
+            <button type="button" id="btn-qty-cancel" class="btn-overlay-secondary">取消</button>
+            <button type="button" id="btn-qty-confirm" class="btn-overlay-primary">确认使用</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/common.js?v=20"></script>
+<script src="js/game.js?v=20"></script>
+</body>
+</html>

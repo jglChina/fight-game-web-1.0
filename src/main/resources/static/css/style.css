@@ -1,0 +1,1509 @@
+/* ==========================================================
+ * 全局样式
+ * ----------------------------------------------------------
+ * 内容：
+ *   1. CSS 变量：背景 / 面板 / 描边 / 文字 / 生命红 / 蓝量蓝 / 金色 / 错误红 / 成功绿
+ *   2. 布局：登录页表单居中、游戏主页两栏、战斗页双方对峙
+ *   3. 血条与蓝条：灰轨道 + 彩色填充，width 过渡实现平滑动画
+ *   4. 按钮三态：正常 / hover / disabled
+ *   5. 战斗日志：半透明底、圆角、可滚动、分色
+ *   6. 结算弹层：全屏遮罩 + 居中卡片 + 渐入动画
+ *   7. 响应式：窄屏（< 900px）战斗页上下排列
+ * ========================================================== */
+
+/* ==========================================================
+ * 配色方案（CSS 变量）
+ * 统一暗黑格斗风，全站颜色统一引用这里的变量
+ * ========================================================== */
+:root {
+    --bg: #12141c;          /* 主背景 */
+    --panel: #1c2030;       /* 面板背景 */
+    --border: #2a3145;      /* 描边 */
+    --text: #e6e9f2;        /* 主文字 */
+    --text-dim: #8b93a7;    /* 次要文字 */
+    --hp: #e5484d;          /* 生命红 */
+    --mp: #3b82f6;          /* 蓝量蓝 */
+    --gold: #f5b942;        /* 胜利/奖励金 */
+    --danger: #ff5c5c;      /* 错误红 */
+    --success: #4ade80;     /* 成功绿 */
+}
+
+/* ==========================================================
+ * 登录页样式
+ * ========================================================== */
+
+/* ---------- 隐藏工具类 ---------- */
+.hidden {
+    display: none !important;
+}
+
+/* ---------- 页面基础 ---------- */
+body {
+    margin: 0;
+    font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+}
+
+/* 登录页整体居中 */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    box-sizing: border-box;
+}
+
+/* ---------- 顶部标题区 ---------- */
+.page-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 2px;
+}
+
+.page-header .subtitle {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+/* ---------- 表单容器 ---------- */
+.auth-container {
+    width: 100%;
+    max-width: 380px;
+}
+
+.form-wrapper {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 22px;
+}
+
+.form-panel h2 {
+    margin: 0 0 18px;
+    font-size: 18px;
+    text-align: center;
+}
+
+/* ---------- 表单项 ---------- */
+.field {
+    display: block;
+    margin-bottom: 14px;
+}
+
+.field > label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+}
+
+.field input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 11px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.field input:focus {
+    border-color: var(--gold);
+}
+
+.field input::placeholder {
+    color: #5b6379;
+}
+
+/* 校验失败时的红框（JS 添加 .input-error） */
+.field input.input-error {
+    border-color: var(--danger);
+}
+
+/* ---------- 密码框 + 显示/隐藏按钮 ---------- */
+.pwd-wrap {
+    position: relative;
+}
+
+.pwd-wrap input {
+    padding-right: 38px;
+}
+
+.pwd-toggle {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--text-dim);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pwd-toggle:hover {
+    color: var(--gold);
+}
+
+/* ---------- 验证码行 ---------- */
+.captcha-row {
+    display: flex;
+    gap: 10px;
+}
+
+.captcha-row input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* 验证码展示框：看起来像输入框，实际是按钮，点击刷新 */
+.captcha-box {
+    flex: 0 0 96px;
+    padding: 9px 0;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--gold);
+    background: var(--bg);
+    border: 1px dashed #3a4157;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.captcha-box:hover {
+    border-color: var(--gold);
+}
+
+/* 验证码加载中：显示旋转的 ⟳ */
+.captcha-box.loading {
+    cursor: progress;
+}
+
+.captcha-box .spin {
+    display: inline-block;
+    font-size: 17px;
+    line-height: 1;
+    animation: fg-spin .9s linear infinite;
+}
+
+@keyframes fg-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ---------- 按钮 ---------- */
+.btn {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 15px;
+    font-family: inherit;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: filter .2s;
+}
+
+.btn-primary {
+    margin-top: 4px;
+    background: var(--gold);
+    color: #1a1c24;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.08);
+}
+
+.btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+/* ---------- 面板切换链接 ---------- */
+.panel-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 13px;
+}
+
+.panel-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+}
+
+.panel-links a:hover {
+    color: var(--gold);
+}
+
+/* ---------- 提示区 ---------- */
+.message-area {
+    min-height: 22px;
+    margin-top: 14px;
+    font-size: 13px;
+    text-align: center;
+    word-break: break-all;
+}
+
+.message-area.error {
+    color: var(--danger);
+}
+
+.message-area.success {
+    color: var(--success);
+}
+
+.message-area.info {
+    color: var(--text-dim);
+}
+
+/* ==========================================================
+ * 游戏主页样式
+ * ========================================================== */
+
+/* ---------- 顶部栏（游戏主页版） ---------- */
+.game-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 720px;
+    margin: 0 auto 24px;
+    padding: 0 16px;
+}
+
+.game-page-header h1 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.user-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+}
+
+.btn-logout {
+    padding: 5px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    background: transparent;
+    border: 1px solid #3a4157;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s;
+}
+
+.btn-logout:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+/* ---------- 游戏容器 ---------- */
+.game-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+}
+
+.panel-title {
+    margin: 0 0 6px;
+    font-size: 18px;
+    text-align: center;
+    color: var(--gold);
+}
+
+.panel-desc {
+    margin: 0 0 14px;
+    font-size: 13px;
+    text-align: center;
+    color: var(--text-dim);
+}
+
+.panel-desc .points-total {
+    color: var(--gold);
+    font-size: 15px;
+}
+
+/* ---------- 创建面板：属性分配器 ---------- */
+.points-allocator {
+    margin-bottom: 14px;
+}
+
+.points-row {
+    display: grid;
+    grid-template-columns: 1fr 160px 120px;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px dashed var(--border);
+}
+
+.points-row:last-child {
+    border-bottom: none;
+}
+
+.points-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.points-label .attr-icon {
+    font-size: 16px;
+}
+
+.points-label .attr-name {
+    color: var(--text);
+}
+
+.points-ctrl {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.points-ctrl button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+    background: var(--border);
+    color: var(--text);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s;
+}
+
+.points-ctrl button:hover:not(:disabled) {
+    background: #3a4157;
+}
+
+.points-ctrl button:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+}
+
+.points-val {
+    font-size: 18px;
+    font-weight: 600;
+    min-width: 28px;
+    text-align: center;
+    color: var(--gold);
+}
+
+.preview-val {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-align: right;
+}
+
+.preview-num {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* 创建面板底部：剩余 + 创建按钮 */
+.create-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+}
+
+.remaining-info {
+    font-size: 14px;
+    color: var(--text-dim);
+}
+
+.remaining-num {
+    font-size: 18px;
+    color: var(--gold);
+}
+
+.btn-create {
+    width: auto;
+    padding: 10px 40px;
+}
+
+/* ---------- 角色卡顶部 ---------- */
+.role-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+}
+
+.role-name {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gold);
+}
+
+.role-wins {
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.role-wins strong {
+    color: var(--gold);
+    font-size: 16px;
+}
+
+/* ---------- 血条 / 蓝条 ---------- */
+.bar-row {
+    margin-bottom: 10px;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+}
+
+.bar-track {
+    position: relative;
+    height: 18px;
+    background: var(--border);
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+/* 条内居中文字：当前 / 上限（深色描边保证在任何填充色上都可读） */
+.bar-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 3px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 9px;
+    transition: width .35s ease;
+}
+
+.bar-fill.hp {
+    background: linear-gradient(90deg, var(--hp), #ff7a7a);
+}
+
+.bar-fill.mp {
+    background: linear-gradient(90deg, var(--mp), #6aa5ff);
+}
+
+/* ---------- 属性网格 ---------- */
+.attr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    margin: 14px 0 16px;
+    padding: 12px;
+    background: var(--bg);
+    border-radius: 8px;
+}
+
+.attr-item {
+    font-size: 14px;
+}
+
+.attr-key {
+    color: var(--text-dim);
+    margin-right: 6px;
+}
+
+.attr-val {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+/* ---------- 子标题 ---------- */
+.sub-title {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin: 14px 0 8px;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 4px;
+}
+
+/* ---------- 技能标签 ---------- */
+.skill-list {
+    margin-bottom: 4px;
+}
+
+.skill-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    margin: 3px 4px 3px 0;
+    background: var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+    color: var(--text);
+}
+
+/* ---------- 背包 ---------- */
+.package-empty {
+    text-align: center;
+    font-size: 13px;
+    color: #5b6379;
+    padding: 12px 0;
+}
+
+.package-list {
+    margin-bottom: 4px;
+}
+
+.package-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 4px;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+}
+
+.package-row:last-child {
+    border-bottom: none;
+}
+
+.package-row .p-name {
+    flex: 0 0 100px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.package-row .p-count {
+    flex: 0 0 40px;
+    color: var(--gold);
+}
+
+.package-row .p-effect {
+    flex: 1;
+    color: var(--text-dim);
+    font-size: 12px;
+}
+
+.package-row .p-use-btn {
+    flex: 0 0 60px;
+    padding: 5px 0;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--gold);
+    color: #1a1c24;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: filter .2s;
+}
+
+.package-row .p-use-btn:hover {
+    filter: brightness(1.08);
+}
+
+.package-row .p-use-btn:active {
+    filter: brightness(.9);
+}
+
+/* ---------- 战斗入口 ---------- */
+.battle-entry {
+    margin-top: 20px;
+}
+
+.btn-battle {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #1a1c24;
+    background: linear-gradient(135deg, #ff4444, var(--gold));
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: filter .2s, transform .1s;
+}
+
+.btn-battle:hover {
+    filter: brightness(1.05);
+}
+
+.btn-battle:active {
+    transform: scale(.99);
+}
+
+.btn-battle.continue-battle {
+    background: linear-gradient(135deg, #4477ff, var(--gold));
+}
+
+/* ==========================================================
+ * 战斗页样式
+ * ========================================================== */
+
+/* ---------- 战斗容器 ---------- */
+.battle-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 16px 30px;
+}
+
+/* ---------- 双方对峙区容器（宽屏左右，窄屏上下） ---------- */
+.fighters-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+    align-items: start;
+}
+
+/* ---------- 顶部 header ---------- */
+.battle-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.battle-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    margin: 0;
+}
+
+.battle-header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.round-text {
+    font-size: 15px;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.btn-abandon {
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--danger);
+    background: transparent;
+    border: 1px solid var(--danger);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s;
+}
+
+.btn-abandon:hover {
+    background: rgba(255, 92, 92, 0.12);
+}
+
+/* ---------- 双方对峙区 ---------- */
+.fighter-area {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 0;
+}
+
+.fighter-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.enemy-head {
+    flex-direction: row;
+}
+
+.fighter-emoji {
+    font-size: 64px;
+    line-height: 1;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+    transition: transform .15s ease;
+}
+
+.fighter-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.fighter-name-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.fighter-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.enemy-name {
+    color: #ff8a8a;
+}
+
+.fighter-attr-row {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.mini-attr b {
+    color: var(--gold);
+    font-weight: 600;
+    margin-left: 2px;
+}
+
+/* ---------- 防御姿态标记 ---------- */
+.defending-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 12px;
+    background: #4477ff;
+    color: #fff;
+    border-radius: 10px;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+}
+
+/* ---------- 行动区 ---------- */
+.action-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.btn-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 12px 4px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #1a1c24;
+    transition: transform .1s, filter .2s;
+    position: relative;
+}
+
+.btn-action:hover:not(:disabled) {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.btn-action:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-action:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-action .btn-icon {
+    font-size: 20px;
+}
+
+.btn-action .btn-text {
+    font-size: 13px;
+}
+
+/* 技能按钮右上角 MP 消耗角标 */
+.btn-action .btn-cost {
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.3;
+    border-radius: 9px;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    opacity: 0.95;
+}
+
+.btn-action.attack { background: var(--gold); }
+.btn-action.skill  { background: #4477ff; color: #fff; }
+.btn-action.heal   { background: var(--success); }
+.btn-action.item   { background: #a070e0; color: #fff; }
+
+/* ---------- 战斗日志区 ---------- */
+.battle-log-title {
+    margin-top: 18px;
+}
+
+.battle-log {
+    height: 300px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.log-line {
+    padding: 2px 0;
+    word-break: break-all;
+}
+
+.log-player { color: #5dd39e; }   /* 我方蓝绿 */
+.log-enemy  { color: var(--danger); }   /* 敌方红 */
+.log-gold   { color: var(--gold); }   /* 奖励金 */
+.log-system { color: var(--text-dim); }   /* 系统灰 */
+
+/* ---------- 结算弹层 ---------- */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    animation: fadeIn 0.25s ease;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.overlay-card {
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.overlay-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.overlay-victory .overlay-title { color: var(--gold); }
+.overlay-defeat .overlay-title { color: var(--danger); }
+
+/* ---------- 胜利 rewards ---------- */
+.reward-list {
+    margin: 12px 0;
+}
+
+.reward-row {
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reward-icon {
+    font-size: 16px;
+}
+
+.growth-row {
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.growth-detail {
+    margin-left: 26px;
+    padding: 6px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+}
+
+.growth-item {
+    font-size: 13px;
+    color: var(--success);
+}
+
+.wins-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    color: var(--gold);
+    font-weight: 600;
+}
+
+/* ---------- 失败 taunt ---------- */
+.taunt-text {
+    padding: 16px;
+    background: rgba(255, 92, 92, 0.08);
+    border: 1px dashed var(--danger);
+    border-radius: 8px;
+    color: #ffb3b3;
+    font-size: 14px;
+    text-align: center;
+    margin: 12px 0;
+    font-style: italic;
+}
+
+/* ---------- 弹层按钮 ---------- */
+.overlay-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.overlay-actions button {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter .2s;
+}
+
+.overlay-actions button:hover {
+    filter: brightness(1.1);
+}
+
+.btn-overlay-primary {
+    background: var(--gold);
+    color: #1a1c24;
+}
+
+.btn-overlay-secondary {
+    background: #3a4157;
+    color: var(--text);
+}
+
+/* ---------- 道具选择弹窗 ---------- */
+.item-picker-card {
+    width: 420px;
+}
+
+.item-picker-list {
+    max-height: 320px;
+    overflow-y: auto;
+    margin: 12px 0;
+}
+
+.item-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+}
+
+.item-picker-row:last-child {
+    border-bottom: none;
+}
+
+.ip-name {
+    flex: 0 0 90px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.ip-count {
+    flex: 0 0 40px;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.ip-effect {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.ip-use-btn {
+    flex: 0 0 56px;
+    padding: 6px 0;
+    background: var(--gold);
+    color: #1a1c24;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter .2s;
+}
+
+.ip-use-btn:hover {
+    filter: brightness(1.1);
+}
+
+.package-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 13px;
+}
+
+/* ==========================================================
+ * 动画清单
+ *   bar-fill width 过渡  → 已在 .bar-fill 上（.35s ease）
+ *   shake                → 受击抖动
+ *   fadeIn / popIn       → 结算层、弹窗出现（已有）
+ *   flashGold            → 胜利奖励数字金色闪烁
+ * ========================================================== */
+
+/* 受击抖动：行动后按掉血给对应区域加 .shake，动画结束由 JS 移除 */
+.fighter-area.shake {
+    animation: shake .35s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(5px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(3px); }
+}
+
+/* 胜利奖励/成长数字金色闪烁 */
+.wins-row,
+.growth-row {
+    animation: flashGold .8s ease 2;
+}
+
+@keyframes flashGold {
+    0%, 100% { filter: brightness(1); }
+    50%      { filter: brightness(1.6) drop-shadow(0 0 6px var(--gold)); }
+}
+
+/* ---------- 响应式：窄屏（< 900px）双方区域上下排列 ---------- */
+@media (max-width: 900px) {
+    .fighters-row {
+        grid-template-columns: 1fr;
+    }
+    .action-bar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================================================
+ * Toast 浮层提示
+ * 位置：屏幕顶部居中（top: 80px），类似手机 toast，不挡操作
+ * ========================================================== */
+.fg-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    animation: toastIn 0.25s ease;
+    max-width: 80vw;
+    text-align: center;
+    pointer-events: none;  /* 不阻挡下方点击 */
+}
+
+.fg-toast-success {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.fg-toast-error {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.fg-toast-info {
+    border-color: #4477ff;
+    color: #77aaff;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ---------- Loading 遮罩（顺手补上，之前也没有样式） ---------- */
+.fg-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+}
+
+.fg-loading-spinner {
+    padding: 16px 32px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--gold);
+    font-size: 14px;
+    animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* ==========================================================
+ * 道具使用数量选择弹窗（game.html 的 item-use-overlay）
+ * ========================================================== */
+.item-use-card {
+    width: 320px;
+}
+
+.item-use-info {
+    margin: 12px 0 18px;
+    text-align: center;
+}
+
+.item-use-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 6px;
+}
+
+.item-use-meta {
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+/* 数量选择器：减号 - 数字 - 加号 横排 */
+.qty-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px 0 20px;
+}
+
+.qty-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--border);
+    color: var(--text);
+    border: 1px solid #3a4157;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+    font-family: inherit;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background: #3a4157;
+    transform: scale(1.05);
+}
+
+.qty-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.qty-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 40px;
+    text-align: center;
+}
+
+/* ==========================================================
+ * 战斗页道具选择器里的行内 +/-（比 game.html 弹窗用的小一号）
+ * ========================================================== */
+.qty-picker-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 8px;
+}
+
+.qty-btn-sm {
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: var(--border);
+    color: var(--text);
+    border: 1px solid #3a4157;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-family: inherit;
+    transition: background 0.15s ease;
+}
+
+.qty-btn-sm:hover:not(:disabled) {
+    background: #3a4157;
+}
+
+.qty-btn-sm:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.qty-value-sm {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    min-width: 20px;
+    text-align: center;
+}
+
+/* ==========================================================
+ * 页面背景图（登录页 / 游戏主页 / 战斗页）
+ * 图片来自 static/images，均铺满整屏并固定；
+ * 上面叠一层深色渐变遮罩（约 0.62~0.72），既能看到照片
+ * 又保证面板和文字对比度
+ * 这里用长属性拆分写法，避免 background 简写在个别浏览器下解析失败
+ * ========================================================== */
+.page-login,
+.page-game,
+.page-battle {
+    background-color: var(--bg);
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.page-login {
+    background-image: linear-gradient(rgba(14, 16, 24, 0.54), rgba(14, 16, 24, 0.62)),
+                      url("/images/bg-login.jpg");
+}
+
+.page-game {
+    background-image: linear-gradient(rgba(14, 16, 24, 0.54), rgba(14, 16, 24, 0.62)),
+                      url("/images/bg-game.jpg");
+}
+
+.page-battle {
+    background-image: linear-gradient(rgba(14, 16, 24, 0.54), rgba(14, 16, 24, 0.62)),
+                      url("/images/bg-battle.jpg");
+}
+
+/* ==========================================================
+ * 头像：注册页上传组件 + 主页顶部 + 战斗页名字旁
+ * 头像以 data URL 存在 localStorage（fg_avatar_用户名）
+ * ========================================================== */
+
+/* 隐藏原生文件选择框，由圆形预览块触发 */
+.avatar-input {
+    display: none;
+}
+
+.avatar-uploader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 圆形选图区：虚线边框，hover 变金色 */
+.avatar-pick {
+    width: 72px;
+    height: 72px;
+    flex: 0 0 72px;
+    border-radius: 50%;
+    border: 1px dashed var(--border);
+    background: rgba(255, 255, 255, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.avatar-pick:hover {
+    border-color: var(--gold);
+}
+
+.avatar-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-placeholder {
+    font-size: 24px;
+    color: var(--text-dim);
+}
+
+.avatar-side {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.avatar-tip {
+    font-size: 12px;
+    color: var(--text-dim);
+}
+
+.avatar-remove {
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--danger);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.avatar-remove:hover {
+    text-decoration: underline;
+}
+
+/* 主页顶部栏的圆形头像 */
+.user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border);
+}
+
+/* 顶部可点击换头像的圆形按钮（包着头像 / 👤 占位） */
+.user-avatar-btn {
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.15s ease;
+}
+
+.user-avatar-btn:hover {
+    box-shadow: 0 0 0 2px var(--gold);
+}
+
+.user-avatar-placeholder {
+    font-size: 26px;
+    line-height: 1;
+}
+
+/* 顶部「欢迎，xxx」：比 user-bar 默认的 14px 更大更醒目 */
+#welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* 创建角色面板整体下移，别贴着顶部栏 */
+#create-panel {
+    margin-top: 36px;
+}
+
+/* 战斗页大图标：己方用玩家头像、敌方用对应敌人图片（无图时退回 emoji） */
+.fighter-avatar-icon {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+}

@@ -1,0 +1,22 @@
+# 构建产物（jar / class / 编译中间文件）
+target/
+
+# IDE 配置
+.idea/
+.vscode/
+*.iml
+
+# 运行日志
+*.log
+
+# 编译产物
+*.class
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 内部设计文档（不随源码发布，保留在本地）
+API接口文档.md
+前端实现步骤.md
+后端实现文档.md
