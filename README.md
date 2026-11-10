@@ -1,10 +1,10 @@
 # fight-game-web
 
-文字格斗游戏 Web 版：注册登录、创建角色、回合制战斗，前端页面与后端服务打包在同一个 jar 内，启动后即可访问。
+文字格斗游戏 Web 版：支持注册登录、找回密码、创建角色分配属性、回合制战斗使用道具和技能。前端页面与后端服务打包在同一个 jar 内，启动后即可访问本地端口8080来游玩。
 
 ## 技术栈
 
-- Java 17 + Spring Boot 3.2.5
+- Java 17 + Spring Boot 3.2.5+Maven
 - 原生 HTML / CSS / JavaScript，静态资源位于 `src/main/resources/static`
 - 无数据库依赖，数据保存在内存中
 
